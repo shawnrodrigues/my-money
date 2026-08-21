@@ -87,6 +87,37 @@ insert into public.profiles (id, email, full_name)
 select id, email, coalesce(raw_user_meta_data->>'full_name', 'Member') from auth.users
 on conflict (id) do update set email = excluded.email;
 
+-- Repair any older or partial RLS setup by recreating the exact policies used by the app.
+drop policy if exists "Users read own entries" on public.entries;
+drop policy if exists "Users create own entries" on public.entries;
+drop policy if exists "Users update own entries" on public.entries;
+drop policy if exists "Users delete own entries" on public.entries;
+drop policy if exists "Users read own people" on public.people;
+drop policy if exists "Users create own people" on public.people;
+drop policy if exists "Users update own people" on public.people;
+drop policy if exists "Users read own goals" on public.goals;
+drop policy if exists "Users create own goals" on public.goals;
+drop policy if exists "Users update own goals" on public.goals;
+drop policy if exists "Users delete own goals" on public.goals;
+drop policy if exists "Users read own notification settings" on public.notification_settings;
+drop policy if exists "Users create own notification settings" on public.notification_settings;
+drop policy if exists "Users update own notification settings" on public.notification_settings;
+
+create policy "Users read own entries" on public.entries for select using (user_id = auth.uid() or public.is_admin());
+create policy "Users create own entries" on public.entries for insert with check (user_id = auth.uid());
+create policy "Users update own entries" on public.entries for update using (user_id = auth.uid() or public.is_admin()) with check (user_id = auth.uid() or public.is_admin());
+create policy "Users delete own entries" on public.entries for delete using (user_id = auth.uid() or public.is_admin());
+create policy "Users read own people" on public.people for select using (user_id = auth.uid() or public.is_admin());
+create policy "Users create own people" on public.people for insert with check (user_id = auth.uid());
+create policy "Users update own people" on public.people for update using (user_id = auth.uid() or public.is_admin()) with check (user_id = auth.uid() or public.is_admin());
+create policy "Users read own goals" on public.goals for select using (user_id = auth.uid() or public.is_admin());
+create policy "Users create own goals" on public.goals for insert with check (user_id = auth.uid());
+create policy "Users update own goals" on public.goals for update using (user_id = auth.uid() or public.is_admin());
+create policy "Users delete own goals" on public.goals for delete using (user_id = auth.uid() or public.is_admin());
+create policy "Users read own notification settings" on public.notification_settings for select using (user_id = auth.uid());
+create policy "Users create own notification settings" on public.notification_settings for insert with check (user_id = auth.uid());
+create policy "Users update own notification settings" on public.notification_settings for update using (user_id = auth.uid());
+
 notify pgrst, 'reload schema';
 
 -- After creating your account, promote it once:
