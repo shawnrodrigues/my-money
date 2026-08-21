@@ -12,8 +12,9 @@ button { cursor: pointer; }
 nav { display: grid; gap: 8px; margin-top: 63px; }
 .nav-item { color: var(--muted); border: 0; background: transparent; text-align: left; padding: 12px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; display: flex; gap: 13px; align-items: center; transition: background .2s, color .2s; }
 .nav-item span { width: 17px; color: inherit; font-size: 16px; text-align: center; }
+.nav-item span { width: 30px; height: 30px; display: grid; place-items: center; flex: 0 0 30px; border-radius: 9px; color: var(--olive); background: var(--olive-soft); font-size: 17px; line-height: 1; }
 .nav-item:hover, .nav-item.active { color: var(--ink); background: #e6e4da; }
-.nav-item.active span { color: var(--orange); }
+.nav-item.active span { color: #fff; background: var(--orange); }
 .sidebar-foot { margin-top: auto; color: #aaa69d; font: 11px var(--mono); display: flex; align-items: center; gap: 8px; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #7c9c65; }
 .main-content { width: calc(100% - 246px); margin-left: 246px; min-height: 100vh; padding: 52px clamp(28px, 6vw, 92px); background: radial-gradient(circle at 86% 8%, #eee9d9 0, transparent 25%), #f6f4ee; }
@@ -103,3 +104,24 @@ body { font-size: 14px; }
 .eyebrow, .sidebar-foot, .sidebar-account span, .entry-main span, .person-main span, .person-balance span, .entry-amount span, .pill, .settings-note, .settings-form small, .optional, .modal-intro, .empty, .calendar-event, .calendar-day b, .calendar-week b, .calendar-legend, .statement-line > span, .statement-list-head, .statement-footer { font-size: 12px; }
 .stat-card p, .panel-head p, .admin-card p, .admin-note span { font-size: 12px; }
 @media (max-width: 700px) { .nav-item { font-size: 11px; } }
+.toast { position: fixed; z-index: 10; top: 24px; right: 24px; max-width: min(360px, calc(100vw - 48px)); padding: 14px 18px; border: 1px solid var(--olive); border-radius: 8px; color: var(--ink); background: var(--olive-soft); box-shadow: 0 12px 30px rgba(0,0,0,.18); font-size: 14px; font-weight: 700; animation: toast-in .25s ease-out; }
+@keyframes toast-in { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
+.panel-head { gap: 20px; }
+.settings-form { padding: 32px; }
+.settings-form label { margin-bottom: 26px; font-size: 13px; }
+.settings-form input:not([type='checkbox']), .settings-form select { padding: 13px 14px; font-size: 14px; }
+.settings-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.edit-btn { border: 0; padding: 8px; color: var(--olive); background: transparent; font-size: 14px; font-weight: 800; cursor: pointer; }
+.edit-btn:hover { color: var(--orange); }
+.person-edit { min-width: 32px; margin-left: 2px; }
+.statement-line { grid-template-columns: 1.1fr 1.5fr 2fr 1fr 34px; }
+@media (max-width: 700px) { .statement-line { grid-template-columns: 1fr auto 34px; } .statement-line .edit-btn { grid-column: 3; grid-row: 1 / span 2; } }
+.webhook-label { color: var(--ink) !important; }
+.statement-header .eyebrow::before { content: '💰 '; }
+.webhook-control { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 5px 12px 5px 14px; border: 1px solid var(--line); border-radius: 12px; background: linear-gradient(135deg, var(--paper), var(--olive-soft)); box-shadow: 0 8px 20px rgba(0,0,0,.08); transition: border-color .2s, box-shadow .2s, transform .2s; }
+.webhook-control:focus-within { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-soft), 0 10px 24px rgba(0,0,0,.1); transform: translateY(-1px); }
+.webhook-control input { flex: 1; min-width: 0; margin-top: 0 !important; padding: 10px 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+.webhook-mark { width: 28px; height: 28px; display: grid; place-items: center; flex: 0 0 28px; border-radius: 8px; color: #fff; background: #5865f2; font-size: 12px; box-shadow: 0 4px 10px rgba(88,101,242,.3); }
+@media (max-width: 590px) { .webhook-control { padding-right: 10px; } }
+@media (max-width: 700px) { .toast { top: auto; right: 16px; bottom: 84px; left: 16px; max-width: none; text-align: center; animation-name: toast-up; } }
+@keyframes toast-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }

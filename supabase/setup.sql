@@ -52,14 +52,18 @@ create policy "Users can read their profile" on public.profiles for select using
 create policy "Users can update own profile" on public.profiles for update using (id = auth.uid() or public.is_admin()) with check (id = auth.uid() or public.is_admin());
 drop policy if exists "Users read own entries" on public.entries;
 drop policy if exists "Users create own entries" on public.entries;
+drop policy if exists "Users update own entries" on public.entries;
 drop policy if exists "Users delete own entries" on public.entries;
 create policy "Users read own entries" on public.entries for select using (user_id = auth.uid() or public.is_admin());
 create policy "Users create own entries" on public.entries for insert with check (user_id = auth.uid());
+create policy "Users update own entries" on public.entries for update using (user_id = auth.uid() or public.is_admin()) with check (user_id = auth.uid() or public.is_admin());
 create policy "Users delete own entries" on public.entries for delete using (user_id = auth.uid() or public.is_admin());
 drop policy if exists "Users read own people" on public.people;
 drop policy if exists "Users create own people" on public.people;
+drop policy if exists "Users update own people" on public.people;
 create policy "Users read own people" on public.people for select using (user_id = auth.uid() or public.is_admin());
 create policy "Users create own people" on public.people for insert with check (user_id = auth.uid());
+create policy "Users update own people" on public.people for update using (user_id = auth.uid() or public.is_admin()) with check (user_id = auth.uid() or public.is_admin());
 drop policy if exists "Users read own goals" on public.goals;
 drop policy if exists "Users create own goals" on public.goals;
 drop policy if exists "Users update own goals" on public.goals;

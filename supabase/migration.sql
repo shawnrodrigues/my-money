@@ -47,10 +47,12 @@ alter table public.entries enable row level security;
 -- Remove/recreate only if these policy names already exist with different definitions.
 drop policy if exists "Users read own entries" on public.entries;
 drop policy if exists "Users create own entries" on public.entries;
+drop policy if exists "Users update own entries" on public.entries;
 drop policy if exists "Users delete own entries" on public.entries;
 
 create policy "Users read own entries" on public.entries for select using (user_id = auth.uid() or public.is_admin());
 create policy "Users create own entries" on public.entries for insert with check (user_id = auth.uid());
+create policy "Users update own entries" on public.entries for update using (user_id = auth.uid() or public.is_admin()) with check (user_id = auth.uid() or public.is_admin());
 create policy "Users delete own entries" on public.entries for delete using (user_id = auth.uid() or public.is_admin());
 
 -- The remaining tables are needed for goals, Discord settings, and profile management.
@@ -62,8 +64,10 @@ create table if not exists public.people (
 alter table public.people enable row level security;
 drop policy if exists "Users read own people" on public.people;
 drop policy if exists "Users create own people" on public.people;
+drop policy if exists "Users update own people" on public.people;
 create policy "Users read own people" on public.people for select using (user_id = auth.uid() or public.is_admin());
 create policy "Users create own people" on public.people for insert with check (user_id = auth.uid());
+create policy "Users update own people" on public.people for update using (user_id = auth.uid() or public.is_admin()) with check (user_id = auth.uid() or public.is_admin());
 
 create table if not exists public.goals (
   id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade,

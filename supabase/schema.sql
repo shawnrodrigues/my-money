@@ -66,9 +66,11 @@ create policy "Users can read their profile" on public.profiles for select using
 create policy "Users can update own profile" on public.profiles for update using (id = auth.uid() or public.is_admin()) with check (id = auth.uid() or public.is_admin());
 create policy "Users read own entries" on public.entries for select using (user_id = auth.uid() or public.is_admin());
 create policy "Users create own entries" on public.entries for insert with check (user_id = auth.uid());
+create policy "Users update own entries" on public.entries for update using (user_id = auth.uid() or public.is_admin()) with check (user_id = auth.uid() or public.is_admin());
 create policy "Users delete own entries" on public.entries for delete using (user_id = auth.uid() or public.is_admin());
 create policy "Users read own people" on public.people for select using (user_id = auth.uid() or public.is_admin());
 create policy "Users create own people" on public.people for insert with check (user_id = auth.uid());
+create policy "Users update own people" on public.people for update using (user_id = auth.uid() or public.is_admin()) with check (user_id = auth.uid() or public.is_admin());
 create policy "Users read own goals" on public.goals for select using (user_id = auth.uid() or public.is_admin());
 create policy "Users create own goals" on public.goals for insert with check (user_id = auth.uid());
 create policy "Users update own goals" on public.goals for update using (user_id = auth.uid() or public.is_admin());
