@@ -81,7 +81,7 @@ async function adminAction(action: 'invite' | 'delete' | 'role' | 'update-profil
 }
 
 async function loadEntries() {
-  const { data, error } = await supabase!.from('entries').select('*').order('date', { ascending: false })
+  const { data, error } = await supabase!.from('entries').select('*').eq('user_id', currentUser!.id).order('date', { ascending: false })
   if (error) throw error
   entries = (data || []) as Entry[]
 }
@@ -250,6 +250,7 @@ function bindShell() {
   document.querySelectorAll<HTMLElement>('[data-filter]').forEach((element) => element.onclick = () => { activeFilter = element.dataset.filter || 'All activity'; render() })
   document.querySelectorAll<HTMLButtonElement>('[data-edit-entry]').forEach((button) => button.onclick = () => openEntryModal('', button.dataset.editEntry || ''))
   document.querySelectorAll<HTMLButtonElement>('[data-delete]').forEach((button) => button.onclick = async () => { await deleteEntry(button.dataset.delete || ''); render() })
+  document.querySelectorAll<HTMLElement>('.statement-line').forEach((row) => { if (row.querySelector('[data-delete]')) return; const editButton = row.querySelector<HTMLButtonElement>('[data-edit-entry]'); if (!editButton?.dataset.editEntry) return; const deleteButton = document.createElement('button'); deleteButton.className = 'delete-btn statement-delete'; deleteButton.dataset.delete = editButton.dataset.editEntry; deleteButton.title = 'Delete entry'; deleteButton.textContent = '×'; deleteButton.onclick = async () => { await deleteEntry(deleteButton.dataset.delete || ''); render() }; row.append(deleteButton) })
   document.querySelector<HTMLButtonElement>('#theme-toggle')!.onclick = toggleTheme
   document.querySelector<HTMLButtonElement>('#sign-out')!.onclick = signOut
   document.querySelectorAll<HTMLButtonElement>('[data-open-entry]').forEach((button) => button.addEventListener('click', () => openEntryModal()))
