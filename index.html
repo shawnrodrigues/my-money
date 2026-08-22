@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f6f4ee" />
     <title>My Money · personal finance tracker</title>
+    <style>
+      :root { color-scheme: light; background: #f6f4ee; }
+      html[data-theme="dark"] { color-scheme: dark; background: #121612; }
+      html, body { min-height: 100%; margin: 0; }
+      body { min-width: 320px; background: #f6f4ee; }
+      html[data-theme="dark"] body { background: #121612; }
+    </style>
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem('my-money-theme') || 'dark';
+    </script>
   </head>
   <body>
     <div id="app"></div>

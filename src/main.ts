@@ -189,7 +189,7 @@ async function signOut() {
 
 function render() {
   document.documentElement.dataset.theme = currentTheme()
-  if (loading) document.querySelector<HTMLDivElement>('#app')!.innerHTML = '<div class="loading-screen">Opening My Money...</div>'
+  if (loading) document.querySelector<HTMLDivElement>('#app')!.innerHTML = '<div class="loading-screen" aria-hidden="true"></div>'
   else if (!currentUser) renderAuth()
   else if (dataError) document.querySelector<HTMLDivElement>('#app')!.innerHTML = `<main class="loading-screen setup-error"><h2>Database setup needed</h2><p>${esc(dataError)}</p><span>Run supabase/setup.sql in your Supabase SQL Editor, then refresh this page.</span></main>`
   else renderApp()
@@ -259,7 +259,18 @@ function bindShell() {
   document.querySelectorAll<HTMLButtonElement>('[data-edit-person]').forEach((button) => button.onclick = (event) => { event.stopPropagation(); openPersonModal(button.dataset.editPerson || '') })
   document.querySelectorAll<HTMLButtonElement>('[data-person-entry]').forEach((button) => button.addEventListener('click', (event) => { event.stopPropagation(); openEntryModal(button.dataset.personEntry) }))
   document.querySelectorAll<HTMLElement>('[data-person-id]').forEach((element) => element.addEventListener('click', () => { selectedPersonId = element.dataset.personId || ''; activeView = 'person-detail'; render() }))
-  document.querySelector<HTMLButtonElement>('#back-to-people')?.addEventListener('click', () => { activeView = 'people'; render() })
+  const backToPeople = document.querySelector<HTMLButtonElement>('#back-to-people')
+  backToPeople?.addEventListener('click', () => { activeView = 'people'; render() })
+  if (backToPeople) {
+    const addEntry = document.createElement('button')
+    addEntry.className = 'primary-btn person-statement-entry'
+    addEntry.innerHTML = '<span>＋</span> Add entry'
+    addEntry.addEventListener('click', () => { const person = people.find((item) => item.id === selectedPersonId); if (person) openEntryModal(person.name) })
+    const entryActions = document.createElement('div')
+    entryActions.className = 'statement-entry-actions'
+    backToPeople.before(entryActions)
+    entryActions.append(backToPeople, addEntry)
+  }
   document.querySelector<HTMLButtonElement>('#print-person')?.addEventListener('click', () => window.print())
   document.querySelector<HTMLButtonElement>('#share-person')?.addEventListener('click', sharePerson)
   document.querySelector<HTMLButtonElement>('#share-person-discord')?.addEventListener('click', sharePersonOnDiscord)
@@ -268,6 +279,20 @@ function bindShell() {
   bindModalForms()
   const categorySelect = document.querySelector<HTMLSelectElement>('select[name="category"]')
   ;['Transport', 'Electronics', 'Shopping', 'Going out', 'Health', 'Bills', 'Education'].forEach((category) => categorySelect?.add(new Option(category)))
+  const personInput = document.querySelector<HTMLInputElement>('#entry-modal input[name="person"]')
+  if (personInput) {
+    const personSelect = document.createElement('select')
+    personSelect.name = 'person'
+    personSelect.innerHTML = '<option value="">No person</option>'
+    people.forEach((person) => personSelect.add(new Option(person.name, person.name)))
+    personSelect.add(new Option('Add a new person...', '__new__'))
+    personInput.replaceWith(personSelect)
+    personSelect.addEventListener('change', () => {
+      if (personSelect.value !== '__new__') return
+      personSelect.value = ''
+      openPersonModal()
+    })
+  }
   document.querySelector<HTMLFormElement>('#profile-form')?.addEventListener('submit', async (event) => { event.preventDefault(); const form = new FormData(event.currentTarget as HTMLFormElement); profileMessage = ''; try { await saveProfile(String(form.get('fullName'))); } catch (error) { profileMessage = error instanceof Error ? error.message : 'Unable to update profile.' } render() })
   document.querySelector<HTMLFormElement>('#person-form')?.addEventListener('submit', async (event) => { event.preventDefault(); const form = new FormData(event.currentTarget as HTMLFormElement); const name = String(form.get('name')).trim(); entryMessage = ''; const duplicate = people.some((person) => person.id !== editingPersonId && person.name.toLowerCase() === name.toLowerCase()); if (duplicate) { entryMessage = 'That person is already in your directory.'; render(); document.querySelector<HTMLDivElement>('#person-modal')?.classList.remove('hidden'); return } try { const person = { name, email: String(form.get('email')).trim(), phone: String(form.get('phone')).trim() }; if (editingPersonId) await updatePerson(editingPersonId, person); else await savePerson(person); editingPersonId = ''; document.querySelector<HTMLDivElement>('#person-modal')?.classList.add('hidden'); render() } catch (error) { entryMessage = errorText(error, 'Unable to save this person.'); render(); document.querySelector<HTMLDivElement>('#person-modal')?.classList.remove('hidden') } })
   document.querySelector<HTMLButtonElement>('#test-discord')?.addEventListener('click', async () => { notificationMessage = ''; const form = document.querySelector<HTMLFormElement>('#notification-form'); const webhook = String(new FormData(form || undefined).get('webhook') || ''); try { await sendDiscordMessage('My Money test: Discord notifications are working.', webhook); notificationMessage = 'Test message sent to Discord.' } catch (error) { notificationMessage = errorText(error, 'Unable to send the test message.') } render() })
